@@ -65,7 +65,9 @@ def clean_message(msg):
 
 def post_to_wall(page_id=None,message=None,page_access_token=None,
                  timestamp=None,link=None, VID_PATH=None, IMG_PATH=None, VID_TITLE=None):
-    
+    '''
+    Function to post to wall
+    '''
     print(link)
     publish=None
     
