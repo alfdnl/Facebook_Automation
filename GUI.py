@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import filedialog
 import kivy
+import os
 kivy.require('1.11.1')
 
 from kivy.app import App
@@ -29,12 +30,14 @@ class MyFloat(FloatLayout):
     def open_post_file(self,btn):
         if isinstance(btn,Button):
  	       	self.post_path = filedialog.askopenfilename()
- 	       	print(self.post_path)
+ 	       	btn.text = self.post_path.replace("/","\\").replace(os.getcwd(),"").replace("\\","")
+ 	       	print(str(self.post_path).replace("/","\\").replace(os.getcwd(),"").replace("\\",""))
     
     def open_detail_file(self,btn):
         if isinstance(btn,Button):
  	       	self.details_path = filedialog.askopenfilename()
- 	       	print(self.details_path)
+ 	       	btn.text = self.post_path.replace("/","\\").replace(os.getcwd(),"").replace("\\","")
+ 	       	print(str(self.details_path).replace("/","\\").replace(os.getcwd(),"").replace("\\",""))
 
     def publish_post(self,btn):
         if isinstance(btn,Button):
