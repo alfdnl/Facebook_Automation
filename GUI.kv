@@ -26,59 +26,125 @@
 			pos: int(self.center_x - self.texture_size[0] / 2.), int(self.center_y - self.texture_size[1] / 2.)
 		PopMatrix
 
+<FlatButton@ButtonBehavior+Label>:
+    font_size: 14
+
 <MyFloat>:
-	# creating canvas 
-    canvas: 
-        Color: 
-            rgba: 0, 0, 1, 1    # Blue 
-  
-        # size and position of Canvas 
-        Rectangle: 
-            pos: (200,200) 
-            size: (50,50)
+	canvas.before:
+        Color:
+            rgba: 1, 1, 1, 1
+        Rectangle:
+            pos: self.pos
+            size: self.size
+	ScrollView:
+        size_hint: 1.0, 0.76
+        pos_hint: {'center_y':0.5}
+        bar_width: 10
+        scroll_type: ['bars', 'content']
 
-        Color: 
-            rgba: 1, 0, 0, 1    # Blue 
-  
-        # size and position of Canvas 
-        Rectangle: 
-            pos: (100,100) 
-            size: (50,50)
+        BoxLayout:
+            id: testing
+            orientation: 'vertical'
+            size_hint: 1, None
+            height: self.minimum_height
+            spacing: 10
+            
+            canvas:
+                Color:
+                    rgba: (1, 1, 1, 1)
+                Rectangle:
+                    size: self.size
+                    pos: self.pos
+            	        
+    BoxLayout:
+        id: header
+        size_hint: 1, 0.05
+        pos_hint: {'top':1.0}                        
+        
+        canvas.before:
+            Color:
+                rgba: (.06, .45, .45, 1)
+            Rectangle:
+                size: self.size
+                pos: self.pos
+        Label:
+            text: 'FB Post Scheduler'
+            size_hint_x: 1
 
-	Label:			 
-		text:"Welcome to FB Automation tools"
-		size_hint: 0.2,0.1
-		pos_hint: {"x":0.4,"y":0.5}
-	
+            bold: True
+            color: (1,1,1,1)
+    
+    BoxLayout:
+        size_hint_y: None
+        pos_hint: {'top':0.93} 
+        height: 30
+        canvas.before:
+            Color:
+                rgba: (.06, .45,.45, 1)
+            Rectangle:
+                size: self.size
+                pos: self.pos
+        Label:
+            text: 'No.'
+            size_hint_x: .1
+        Label:
+            text: 'Page Name'
+            size_hint_x: .1
+        Label:
+            text: 'Message'
+            size_hint_x: .2
+        Label:
+            text: 'Link'
+            size_hint_x: .1
+        Label:
+            text: 'Img_Path'
+            size_hint_x: .1
+        Label:
+            text: 'Vid_Path'
+            size_hint_x: .1
+        Label:
+            text: 'Vid_Title'
+            size_hint_x: .1
+        Label:
+            text: 'Date & Time'
+            size_hint_x: .2
+        Label:
+            text: 'Status'
+            size_hint_x: .1    
+                   
 
-	ScaleButton:
-		id: post_file
-		text:"Select Post File"
-		padding: dp(12), dp(12)
-		font_size: self.height * 0.5 
-		color: 0, 255, 255, 1
-		size_hint: 0.2,0.1
-		pos_hint:{"x":0.2,"y":0.0}
-		on_release: root.open_post_file(self)
 
-	ScaleButton:
-		id: detail_file
-		text:"Select Detail File"
-		padding: dp(12), dp(12)
-		font_size: self.height * 0.5 
-		color: 0, 255, 255, 1
-		size_hint: 0.2,0.1
-		pos_hint:{"x":0.4,"y":0.0}
-		on_release: root.open_detail_file(self)
+	BoxLayout:
+		pos_hint: {'y':0}
+		size_hint: 1, 0.12
+		ScaleButton:
+			id: post_file
+			text:"Select Post File"
+			padding: dp(12), dp(12)
+			font_size: self.height * 0.5 
+			color: (1, 1, 1, 1)
+			size_hint: 0.2,1
+			
+			on_release: root.open_post_file(self)
 
-	ScaleButton:
-		id: detail_file
-		text:"Publish Post"
-		padding: dp(12), dp(12)
-		font_size: self.height * 0.5 
-		color: 0, 255, 255, 1
-		size_hint: 0.2,0.1
-		pos_hint:{"x":0.6,"y":0.0}
-		on_release: root.publish_post(self)
+		ScaleButton:
+			id: detail_file
+			text:"Select Detail File"
+			padding: dp(12), dp(12)
+			font_size: self.height * 0.5 
+			color: (1, 0, 1, 1)
+			size_hint: 0.2,1
+			
+			on_release: root.open_detail_file(self)
+
+		ScaleButton:
+			id: detail_file
+			text:"Publish Post"
+			padding: dp(12), dp(12)
+			font_size: self.height * 0.5 
+			color: 0, 255, 255, 1
+			size_hint: 0.2,1
+			
+			on_release: root.start_new_thread(self)
 
 	
