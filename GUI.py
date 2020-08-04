@@ -16,9 +16,11 @@ from kivy.uix.boxlayout import BoxLayout
 from random import random
 from Facebook_automation import *
 from kivy.uix.scrollview import ScrollView
+from kivy.config import Config
 import pandas as pd
 import json
 import threading
+
 
 
 class MyFloat(FloatLayout):    
@@ -36,14 +38,22 @@ class MyFloat(FloatLayout):
         # if isinstance(btn,Button):
         # print("Enter")
         self.post_path = filedialog.askopenfilename()
-        btn.text = self.post_path.replace("/","\\").replace(os.getcwd(),"").replace("\\","")
-        print(str(self.post_path).replace("/","\\").replace(os.getcwd(),"").replace("\\",""))
+        if self.post_path is not '':
+        	btn.text = self.post_path.replace("/","\\").replace(os.getcwd(),"").replace("\\","")
+        	print(str(self.post_path).replace("/","\\").replace(os.getcwd(),"").replace("\\",""))
+        else:
+        	btn.text='Select Post File'
+        	print("No file choosen")	
     
     def open_detail_file(self,btn):
         # if isinstance(btn,Button):
         self.details_path = filedialog.askopenfilename()
-        btn.text = self.details_path.replace("/","\\").replace(os.getcwd(),"").replace("\\","")
-        print(str(self.details_path).replace("/","\\").replace(os.getcwd(),"").replace("\\",""))
+        if self.details_path is not '':
+        	btn.text = self.details_path.replace("/","\\").replace(os.getcwd(),"").replace("\\","")
+        	print(str(self.details_path).replace("/","\\").replace(os.getcwd(),"").replace("\\",""))
+        else:
+        	btn.text='Select Details File'
+        	print("No file choosen")
     
     @mainthread
     def create_row(self, *args):
@@ -57,23 +67,15 @@ class MyFloat(FloatLayout):
         
         # Details
         index = Label(text=str(args[0]+1),size_hint_x=.1,color=(0,0,0,1))
-        name = Label(text=args[1],size_hint_x=.1,color=(0,0,0,1))
-        Message = Label(text='0.00',size_hint_x=.2,color=(0,0,0,1))
-        Link = Label(text='0.00',size_hint_x=.1,color=(0,0,0,1))
-        Img_Path = Label(text='0.00',size_hint_x=.1,color=(0,0,0,1))
-        Vid_Path = Label(text='0.00',size_hint_x=.1,color=(0,0,0,1))
-        Vid_Title =Label(text='0.00',size_hint_x=.1,color=(0,0,0,1))
+        name = Label(text=args[1],size_hint_x=.2,color=(0,0,0,1))
+        post_id = Label(text=args[-1],size_hint_x=.2,color=(0,0,0,1))        
         DateTime =Label(text=args[2],size_hint_x=.2,color=(0,0,0,1))
-        Status =Label(text=args[3],size_hint_x=.1,color=(0,0,0,1))
+        Status =Label(text=args[3],size_hint_x=.2,color=(0,0,0,1))
         
         # Add Widget
         details.add_widget(index)
         details.add_widget(name)
-        details.add_widget(Message)
-        details.add_widget(Link)
-        details.add_widget(Img_Path)
-        details.add_widget(Vid_Path)
-        details.add_widget(Vid_Title)
+        details.add_widget(post_id)        
         details.add_widget(DateTime)
         details.add_widget(Status)
 
@@ -130,16 +132,19 @@ class MyFloat(FloatLayout):
                 status = post_to_wall(page_id,row[1],page_access_token,row[-1],link,VID_PATH,IMG_PATH,VID_TITLE)
                 print(status)
                 status_dict = json.loads(status)
+                post_id="None"
 
                 if 'id' in status_dict.keys():
                     print('Success')
-                    Status='Success'
+                    print(status_dict['id'].replace(page_id+"_",""))
+                    Status='Scheduled'
+                    post_id = status_dict['id'].replace(page_id+"_","")
                 else:
                     print(status_dict['error']['message'])
                     Status='Error'
                 
                 # Update in main thread
-                self.create_row(index,row[0],row[-1],Status)
+                self.create_row(index,row[0],row[-1],Status,post_id)
                 # t = threading.Thread(target=self.create_row, args=[index,row[0],row[-1],Status])
                 # t.start()
                 # threads.append(t)
@@ -177,7 +182,8 @@ class MyFloat(FloatLayout):
 class GUI(MDApp):
 
     def build(self):
-        # return a Button() as a root widget
+        self.title="FB Post Scheduler"
+        self.icon = 'icon.png'
         layout = MyFloat() 
         
         return layout
@@ -190,8 +196,8 @@ class GUI(MDApp):
             print("Select Post File")
             MyFloat.open_post_file(self,btn)
         if btn.text == "Select Detail File":
-        	print("Select Details File")
-        	MyFloat.open_detail_file(self,btn)
+            print("Select Details File")
+            MyFloat.open_detail_file(self,btn)
         # print("Stuff")
 
 
