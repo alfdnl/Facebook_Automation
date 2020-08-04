@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import filedialog
 import kivy
+from kivymd.app import MDApp
 import os
 kivy.require('1.11.1')
 from kivy.clock import Clock, mainthread
@@ -19,6 +20,7 @@ import pandas as pd
 import json
 import threading
 
+
 class MyFloat(FloatLayout):    
     
     def __init__(self, **kwargs):
@@ -31,16 +33,17 @@ class MyFloat(FloatLayout):
         pass
     
     def open_post_file(self,btn):
-        if isinstance(btn,Button):
-            self.post_path = filedialog.askopenfilename()
-            btn.text = self.post_path.replace("/","\\").replace(os.getcwd(),"").replace("\\","")
-            print(str(self.post_path).replace("/","\\").replace(os.getcwd(),"").replace("\\",""))
+        # if isinstance(btn,Button):
+        # print("Enter")
+        self.post_path = filedialog.askopenfilename()
+        btn.text = self.post_path.replace("/","\\").replace(os.getcwd(),"").replace("\\","")
+        print(str(self.post_path).replace("/","\\").replace(os.getcwd(),"").replace("\\",""))
     
     def open_detail_file(self,btn):
-        if isinstance(btn,Button):
-            self.details_path = filedialog.askopenfilename()
-            btn.text = self.details_path.replace("/","\\").replace(os.getcwd(),"").replace("\\","")
-            print(str(self.details_path).replace("/","\\").replace(os.getcwd(),"").replace("\\",""))
+        # if isinstance(btn,Button):
+        self.details_path = filedialog.askopenfilename()
+        btn.text = self.details_path.replace("/","\\").replace(os.getcwd(),"").replace("\\","")
+        print(str(self.details_path).replace("/","\\").replace(os.getcwd(),"").replace("\\",""))
     
     @mainthread
     def create_row(self, *args):
@@ -53,15 +56,15 @@ class MyFloat(FloatLayout):
         posts_container.add_widget(details)                        
         
         # Details
-        index = Label(text=str(args[0]+1),size_hint_x=.1,color=(.06,.45,.45,1))
-        name = Label(text=args[1],size_hint_x=.1,color=(.06,.45,.45,1))
-        Message = Label(text='0.00',size_hint_x=.2,color=(.06,.45,.45,1))
-        Link = Label(text='0.00',size_hint_x=.1,color=(.06,.45,.45,1))
-        Img_Path = Label(text='0.00',size_hint_x=.1,color=(.06,.45,.45,1))
-        Vid_Path = Label(text='0.00',size_hint_x=.1,color=(.06,.45,.45,1))
-        Vid_Title =Label(text='0.00',size_hint_x=.1,color=(.06,.45,.45,1))
-        DateTime =Label(text=args[2],size_hint_x=.2,color=(.06,.45,.45,1))
-        Status =Label(text=args[3],size_hint_x=.1,color=(.06,.45,.45,1))
+        index = Label(text=str(args[0]+1),size_hint_x=.1,color=(0,0,0,1))
+        name = Label(text=args[1],size_hint_x=.1,color=(0,0,0,1))
+        Message = Label(text='0.00',size_hint_x=.2,color=(0,0,0,1))
+        Link = Label(text='0.00',size_hint_x=.1,color=(0,0,0,1))
+        Img_Path = Label(text='0.00',size_hint_x=.1,color=(0,0,0,1))
+        Vid_Path = Label(text='0.00',size_hint_x=.1,color=(0,0,0,1))
+        Vid_Title =Label(text='0.00',size_hint_x=.1,color=(0,0,0,1))
+        DateTime =Label(text=args[2],size_hint_x=.2,color=(0,0,0,1))
+        Status =Label(text=args[3],size_hint_x=.1,color=(0,0,0,1))
         
         # Add Widget
         details.add_widget(index)
@@ -75,8 +78,8 @@ class MyFloat(FloatLayout):
         details.add_widget(Status)
 
     def start_new_thread(self,btn):
-    	threading.Thread(target=self.publish_post, args=(btn,)).start()
-    	
+        threading.Thread(target=self.publish_post, args=(btn,)).start()
+        
 
     def publish_post(self,btn):
         if isinstance(btn,Button):
@@ -85,6 +88,7 @@ class MyFloat(FloatLayout):
             
             # post_to_wall(self.details_path,self.post_path)
             # Get the users details from csv file
+            print("Inside publish post {}",self.details_path)
             details_df = pd.read_csv(self.details_path)
 
             email = details_df.loc[0][0]
@@ -141,15 +145,15 @@ class MyFloat(FloatLayout):
                 # threads.append(t)
                 # details = BoxLayout(size_hint_y=None,height=30,pos_hint={'top': 1})
                 # posts_container.add_widget(details)                        
-                # index = Label(text=str(index+1),size_hint_x=.1,color=(.06,.45,.45,1))
-                # name = Label(text=row[0],size_hint_x=.1,color=(.06,.45,.45,1))
-                # Message = Label(text='0.00',size_hint_x=.2,color=(.06,.45,.45,1))
-                # Link = Label(text='0.00',size_hint_x=.1,color=(.06,.45,.45,1))
-                # Img_Path = Label(text='0.00',size_hint_x=.1,color=(.06,.45,.45,1))
-                # Vid_Path = Label(text='0.00',size_hint_x=.1,color=(.06,.45,.45,1))
-                # Vid_Title =Label(text='0.00',size_hint_x=.1,color=(.06,.45,.45,1))
-                # DateTime =Label(text=row[-1],size_hint_x=.2,color=(.06,.45,.45,1))
-                # Status =Label(text=Status,size_hint_x=.1,color=(.06,.45,.45,1))
+                # index = Label(text=str(index+1),size_hint_x=.1,color=(0,0,0,1))
+                # name = Label(text=row[0],size_hint_x=.1,color=(0,0,0,1))
+                # Message = Label(text='0.00',size_hint_x=.2,color=(0,0,0,1))
+                # Link = Label(text='0.00',size_hint_x=.1,color=(0,0,0,1))
+                # Img_Path = Label(text='0.00',size_hint_x=.1,color=(0,0,0,1))
+                # Vid_Path = Label(text='0.00',size_hint_x=.1,color=(0,0,0,1))
+                # Vid_Title =Label(text='0.00',size_hint_x=.1,color=(0,0,0,1))
+                # DateTime =Label(text=row[-1],size_hint_x=.2,color=(0,0,0,1))
+                # Status =Label(text=Status,size_hint_x=.1,color=(0,0,0,1))
                 
 
                 # details.add_widget(index)
@@ -170,13 +174,26 @@ class MyFloat(FloatLayout):
     def show_load_list(self):
         pass
 
-class GUI(App):
+class GUI(MDApp):
 
     def build(self):
         # return a Button() as a root widget
         layout = MyFloat() 
         
         return layout
+
+    def print_stuff(self,btn):
+        # if MyFloat.ids.post_file:
+        #     print("Post Template")
+        # print(btn.text)
+        if btn.text == "Select Post File":
+            print("Select Post File")
+            MyFloat.open_post_file(self,btn)
+        if btn.text == "Select Detail File":
+        	print("Select Details File")
+        	MyFloat.open_detail_file(self,btn)
+        # print("Stuff")
+
 
 if __name__ == '__main__':
     root = tk.Tk()
