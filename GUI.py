@@ -30,6 +30,7 @@ class MyFloat(FloatLayout):
 
         self.post_path=None
         self.details_path=None
+        # self.state="normal"
 
     def foo(self):
         pass
@@ -40,7 +41,7 @@ class MyFloat(FloatLayout):
         self.post_path = filedialog.askopenfilename()
         if self.post_path is not '':
         	btn.text = self.post_path.replace("/","\\").replace(os.getcwd(),"").replace("\\","")
-        	print(str(self.post_path).replace("/","\\").replace(os.getcwd(),"").replace("\\",""))
+        	print(str(self.post_path).replace("/","\\").replace(os.getcwd(),"").replace("\\",""))        	        	
         else:
         	btn.text='Select Post File'
         	print("No file choosen")	
