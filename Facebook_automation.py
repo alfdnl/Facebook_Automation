@@ -89,12 +89,15 @@ def post_to_wall(page_id=None,message=None,page_access_token=None,
         'scheduled_publish_time':timestamp,    
         }
         
-        files = {
-            'file': open(VID_PATH, 'rb')
-        }
-        
-        x = requests.post(f'https://graph.facebook.com/{page_id}/videos',data=data, files=files)
-        return x.text
+        try:
+            files = {
+                'file': open(VID_PATH, 'rb')
+            }
+            
+            x = requests.post(f'https://graph.facebook.com/{page_id}/videos',data=data, files=files)
+            return x.text
+        except:
+            return '''{"error":{"message":"Wrong file path"}}'''
     
     elif IMG_PATH is not None:
         print("Image Post")
@@ -107,14 +110,15 @@ def post_to_wall(page_id=None,message=None,page_access_token=None,
         'published': publish,
         'scheduled_publish_time':timestamp,
         }
-        
-        files = {
-            'file': open(IMG_PATH, 'rb')
-        }
-        
-        x = requests.post(f'https://graph.facebook.com/{page_id}/photos', data=data, files=files)
-        return x.text
-    
+        try:
+            files = {
+                'file': open(IMG_PATH, 'rb')
+            }
+            
+            x = requests.post(f'https://graph.facebook.com/{page_id}/photos', data=data, files=files)
+            return x.text
+        except:
+            return '''{"error":{"message":"Wrong file path"}}'''
     else:
         print("Normal Post")
         print(link)
@@ -133,47 +137,48 @@ def post_to_wall(page_id=None,message=None,page_access_token=None,
 
 ## MAIN PROGRAM
 def main(details_path,post_path):
-	# Get the users details from csv file
-	details_df = pd.read_csv(details_path)
+    # Get the users details from csv file
+    details_df = pd.read_csv(details_path)
 
-	email = details_df.loc[0][0]
-	password = details_df.loc[0][1]
-	client_id= details_df.loc[0][2]
+    email = details_df.loc[0][0]
+    password = details_df.loc[0][1]
+    client_id= details_df.loc[0][2]
 
-	# Get access token
-	access_token = get_user_access_token(email,password,client_id)
+    # Get access token
+    access_token = get_user_access_token(email,password,client_id)
 
-	# Load post data
-	post_df= pd.read_csv(post_path).fillna(value= '')
+    # Load post data
+    post_df= pd.read_csv(post_path).fillna(value= '')
 
-	# Loop through the data and post it on FB
-	for index, row in post_df.iterrows():
-	    print()
-	    if row[2].strip() == '':
-	        print("masuk")
-	        link = None
-	    else:
-	        link = row[2]
-	    if row[3].strip() == '':
-	        IMG_PATH = None
-	    else:
-	        IMG_PATH = row[3]
-	    if row[4].strip() == '':
-	        VID_PATH = None
-	    else:
-	        VID_PATH = row[4]
-	    if row[5].strip() == '':
-	        VID_TITLE = None
-	    else:
-	        VID_TITLE = row[5]
-	    
-	    print(index,type(row[-1]))
-	    print(row[5])
-	    page_access_token,page_id = get_page_access_token(access_token,row[0])
-	    print(page_access_token,page_id)
-	    
-	#     timestamp = date_to_timestamp(row[-1])
-	#     print(timestamp)
-	    print(link)
-	    print(post_to_wall(page_id,row[1],page_access_token,row[-1],link,VID_PATH,IMG_PATH,VID_TITLE))
+    # Loop through the data and post it on FB
+    for index, row in post_df.iterrows():
+        print()
+        if row[2].strip() == '':
+            print("masuk")
+            link = None
+        else:
+            link = row[2]
+        if row[3].strip() == '':
+            IMG_PATH = None
+        else:
+            IMG_PATH = row[3]
+        if row[4].strip() == '':
+            VID_PATH = None
+        else:
+            VID_PATH = row[4]
+        if row[5].strip() == '':
+            VID_TITLE = None
+        else:
+            VID_TITLE = row[5]
+        
+        print(index,type(row[-1]))
+        print(row[5])
+        page_access_token,page_id = get_page_access_token(access_token,row[0])
+        print(page_access_token,page_id)
+        
+    #     timestamp = date_to_timestamp(row[-1])
+    #     print(timestamp)
+        print(link)
+        print(post_to_wall(page_id,row[1],page_access_token,row[-1],link,VID_PATH,IMG_PATH,VID_TITLE))
+        
 
