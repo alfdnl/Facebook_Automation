@@ -1,3 +1,21 @@
+## Windows Initialisation
+from win32api import GetSystemMetrics
+from kivy.config import Config
+
+print("Width =", GetSystemMetrics(0))
+print("Height =", GetSystemMetrics(1))
+
+# Adjust the position of the window
+Config.set('graphics', 'position', 'custom')
+Config.set('graphics', 'left', 0)
+Config.set('graphics', 'top',  30) 
+  
+# fix the width of the window  
+Config.set('graphics', 'width', GetSystemMetrics(0))
+# fix the height of the window  
+Config.set('graphics', 'height', GetSystemMetrics(1)-70)  
+
+# Imports
 import tkinter as tk
 from tkinter import filedialog
 import kivy
@@ -16,10 +34,10 @@ from kivy.uix.boxlayout import BoxLayout
 from random import random
 from Facebook_automation import *
 from kivy.uix.scrollview import ScrollView
-from kivy.config import Config
 import pandas as pd
 import json
 import threading
+
 
 
 
@@ -40,28 +58,28 @@ class MyFloat(FloatLayout):
         # print("Enter")
         self.post_path = filedialog.askopenfilename()
         if self.post_path is not '':
-        	btn.text = self.post_path.replace("/","\\").replace(os.getcwd(),"").replace("\\","")
-        	print(str(self.post_path).replace("/","\\").replace(os.getcwd(),"").replace("\\",""))        	        	
+            btn.text = os.path.basename(self.post_path)
+            print(btn.text)                        
         else:
-        	btn.text='Select Post File'
-        	print("No file choosen")	
+            btn.text='Select Post File'
+            print("No file choosen")    
     
     def open_detail_file(self,btn):
         # if isinstance(btn,Button):
         self.details_path = filedialog.askopenfilename()
         if self.details_path is not '':
-        	btn.text = self.details_path.replace("/","\\").replace(os.getcwd(),"").replace("\\","")
-        	print(str(self.details_path).replace("/","\\").replace(os.getcwd(),"").replace("\\",""))
+            btn.text = os.path.basename(self.details_path)
+            print(btn.text)
         else:
-        	btn.text='Select Details File'
-        	print("No file choosen")
+            btn.text='Select Details File'
+            print("No file choosen")
     
     @mainthread
     def create_row(self, *args):
         print("Inside create_row")        
         # Get the id of the window
         posts_container = self.ids.testing
-        
+
         # Create box layout
         details = BoxLayout(size_hint_y=None,height=30,pos_hint={'top': 1})
         posts_container.add_widget(details)                        
@@ -69,9 +87,10 @@ class MyFloat(FloatLayout):
         # Details
         index = Label(text=str(args[0]+1),size_hint_x=.1,color=(0,0,0,1))
         name = Label(text=args[1],size_hint_x=.2,color=(0,0,0,1))
-        post_id = Label(text=args[-1],size_hint_x=.2,color=(0,0,0,1))        
+        post_id = Label(text=args[4],size_hint_x=.2,color=(0,0,0,1))        
         DateTime =Label(text=args[2],size_hint_x=.2,color=(0,0,0,1))
         Status =Label(text=args[3],size_hint_x=.2,color=(0,0,0,1))
+        remarks =Label(text=args[-1],size_hint_x=.4,color=(0,0,0,1))
         
         # Add Widget
         details.add_widget(index)
@@ -79,6 +98,7 @@ class MyFloat(FloatLayout):
         details.add_widget(post_id)        
         details.add_widget(DateTime)
         details.add_widget(Status)
+        details.add_widget(remarks)
 
     def start_new_thread(self,btn):
         threading.Thread(target=self.publish_post, args=(btn,)).start()
@@ -88,8 +108,8 @@ class MyFloat(FloatLayout):
         if isinstance(btn,Button):
             threads=[]
             posts_container = self.ids.testing
+            posts_container.clear_widgets()
             
-            # post_to_wall(self.details_path,self.post_path)
             # Get the users details from csv file
             print("Inside publish post {}",self.details_path)
             details_df = pd.read_csv(self.details_path)
@@ -133,7 +153,8 @@ class MyFloat(FloatLayout):
                 status = post_to_wall(page_id,row[1],page_access_token,row[-1],link,VID_PATH,IMG_PATH,VID_TITLE)
                 print(status)
                 status_dict = json.loads(status)
-                post_id="None"
+                post_id= "None"
+                remarks= ""
 
                 if 'id' in status_dict.keys():
                     print('Success')
@@ -142,41 +163,13 @@ class MyFloat(FloatLayout):
                     post_id = status_dict['id'].replace(page_id+"_","")
                 else:
                     print(status_dict['error']['message'])
+                    remarks= status_dict['error']['message'].replace("(#100) ","")
+                    print(remarks)
                     Status='Error'
                 
                 # Update in main thread
-                self.create_row(index,row[0],row[-1],Status,post_id)
-                # t = threading.Thread(target=self.create_row, args=[index,row[0],row[-1],Status])
-                # t.start()
-                # threads.append(t)
-                # details = BoxLayout(size_hint_y=None,height=30,pos_hint={'top': 1})
-                # posts_container.add_widget(details)                        
-                # index = Label(text=str(index+1),size_hint_x=.1,color=(0,0,0,1))
-                # name = Label(text=row[0],size_hint_x=.1,color=(0,0,0,1))
-                # Message = Label(text='0.00',size_hint_x=.2,color=(0,0,0,1))
-                # Link = Label(text='0.00',size_hint_x=.1,color=(0,0,0,1))
-                # Img_Path = Label(text='0.00',size_hint_x=.1,color=(0,0,0,1))
-                # Vid_Path = Label(text='0.00',size_hint_x=.1,color=(0,0,0,1))
-                # Vid_Title =Label(text='0.00',size_hint_x=.1,color=(0,0,0,1))
-                # DateTime =Label(text=row[-1],size_hint_x=.2,color=(0,0,0,1))
-                # Status =Label(text=Status,size_hint_x=.1,color=(0,0,0,1))
-                
-
-                # details.add_widget(index)
-                # details.add_widget(name)
-                # details.add_widget(Message)
-                # details.add_widget(Link)
-                # details.add_widget(Img_Path)
-                # details.add_widget(Vid_Path)
-                # details.add_widget(Vid_Title)
-                # details.add_widget(DateTime)
-                # details.add_widget(Status)
-            # for thread in threads:
-            #     thread.join()
-                
-       
-            
-    
+                self.create_row(index,row[0],row[-1],Status,post_id,remarks)
+  
     def show_load_list(self):
         pass
 
@@ -185,22 +178,8 @@ class GUI(MDApp):
     def build(self):
         self.title="FB Post Scheduler"
         self.icon = 'icon.png'
-        layout = MyFloat() 
-        
-        return layout
-
-    def print_stuff(self,btn):
-        # if MyFloat.ids.post_file:
-        #     print("Post Template")
-        # print(btn.text)
-        if btn.text == "Select Post File":
-            print("Select Post File")
-            MyFloat.open_post_file(self,btn)
-        if btn.text == "Select Detail File":
-            print("Select Details File")
-            MyFloat.open_detail_file(self,btn)
-        # print("Stuff")
-
+        layout = MyFloat()         
+        return layout    
 
 if __name__ == '__main__':
     root = tk.Tk()
