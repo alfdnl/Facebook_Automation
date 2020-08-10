@@ -108,6 +108,7 @@ def post_to_wall(page_id=None,message=None,page_access_token=None,
         if link is None:
             link =''
         if len(IMG_PATH.split(",")) > 1:
+        	# Mulitple post
             print("Multiple Image Post")
 
             IMG_PATH = IMG_PATH.split(",")
