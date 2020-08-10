@@ -34,11 +34,10 @@ from kivy.uix.boxlayout import BoxLayout
 from random import random
 from Facebook_automation import *
 from kivy.uix.scrollview import ScrollView
+from kivy.uix.popup import Popup
 import pandas as pd
 import json
 import threading
-
-
 
 
 class MyFloat(FloatLayout):    
@@ -48,7 +47,6 @@ class MyFloat(FloatLayout):
 
         self.post_path=None
         self.details_path=None
-        # self.state="normal"
 
     def foo(self):
         pass
@@ -76,7 +74,8 @@ class MyFloat(FloatLayout):
     
     @mainthread
     def create_row(self, *args):
-        print("Inside create_row")        
+        print("Inside create_row")
+
         # Get the id of the window
         posts_container = self.ids.testing
 
@@ -119,10 +118,18 @@ class MyFloat(FloatLayout):
             client_id= details_df.loc[0][2]
 
             # Get access token
+            
             access_token = get_user_access_token(email,password,client_id)
+            if access_token == 'None':
+	            self.show_popup1()
+	            return
 
             # Load post data
-            post_df= pd.read_csv(self.post_path).fillna(value= '')
+            try:
+            	post_df= pd.read_csv(self.post_path).fillna(value= '')
+            except:
+            	self.show_popup2()
+            	return
 
             # Loop through the data and post it on FB
             for index, row in post_df.iterrows():
@@ -147,7 +154,9 @@ class MyFloat(FloatLayout):
                 
                 # print(index,type(row[-1]))
                 # print(row[5])
+                
                 page_access_token,page_id = get_page_access_token(access_token,row[0])
+                
                 # print(page_access_token,page_id)                        
                 # print(link)
                 status = post_to_wall(page_id,row[1],page_access_token,row[-1],link,VID_PATH,IMG_PATH,VID_TITLE)
@@ -170,8 +179,26 @@ class MyFloat(FloatLayout):
                 # Update in main thread
                 self.create_row(index,row[0],row[-1],Status,post_id,remarks)
   
-    def show_load_list(self):
-        pass
+    def show_popup1(self):
+        floatL = FloatLayout(size=(300, 300))
+        btn = Button(text ='Invalid Username/Password',
+                    size_hint =(.3, .2), 
+                    pos_hint ={'x':.35, 'y':.4 })
+        floatL.add_widget(btn)
+        popupWindow = Popup(title="Error", content= floatL, size_hint=(None,None),size=(400,400))
+        popupWindow.open()
+
+    def show_popup2(self):
+        floatL = FloatLayout(size=(300, 300))
+        btn = Button(text ='Post Template file is not chosen',
+                    size_hint =(.3, .2), 
+                    pos_hint ={'x':.35, 'y':.4 })
+        floatL.add_widget(btn)
+        popupWindow = Popup(title="Error", content= floatL, size_hint=(None,None),size=(400,400))
+        popupWindow.open()
+
+
+        
 
 class GUI(MDApp):
 

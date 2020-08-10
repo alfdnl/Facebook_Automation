@@ -8,24 +8,28 @@ from webdriver_manager.chrome import ChromeDriverManager
 import facebook
 import pandas as pd
 import datetime
-
+import json
 ## FUNCTIONS
 
 def get_user_access_token(email,password,client_id):
     '''
     Get user's access token
     '''
-
+    access_token="None"
+    
     # Initiate driver to log in to facebook
     driver = webdriver.Chrome(ChromeDriverManager().install())
-    driver.get(f"https://www.facebook.com/dialog/oauth?client_id={client_id}&redirect_uri=https://www.facebook.com/connect/login_success.html&response_type=token")
-    driver.find_element_by_xpath('/html/body/div[1]/div[3]/div[1]/div/div/div[2]/div[1]/form/div/div[1]/input').send_keys(email)
-    driver.find_element_by_xpath("/html/body/div[1]/div[3]/div[1]/div/div/div[2]/div[1]/form/div/div[2]/input").send_keys(password)
-    driver.find_element_by_xpath("/html/body/div[1]/div[3]/div[1]/div/div/div[2]/div[1]/form/div/div[3]/button").click()
-    time.sleep(2)
-    acc_tok = driver.current_url
-    driver.close()    
-    access_token = urllib.parse.urlparse(acc_tok).fragment[13:-55]
+    try:
+        driver.get(f"https://www.facebook.com/dialog/oauth?client_id={client_id}&redirect_uri=https://www.facebook.com/connect/login_success.html&response_type=token")
+        driver.find_element_by_xpath('/html/body/div[1]/div[3]/div[1]/div/div/div[2]/div[1]/form/div/div[1]/input').send_keys(email)
+        driver.find_element_by_xpath("/html/body/div[1]/div[3]/div[1]/div/div/div[2]/div[1]/form/div/div[2]/input").send_keys(password)
+        driver.find_element_by_xpath("/html/body/div[1]/div[3]/div[1]/div/div/div[2]/div[1]/form/div/div[3]/button").click()
+        time.sleep(2)
+        acc_tok = driver.current_url
+        driver.close()    
+        access_token = urllib.parse.urlparse(acc_tok).fragment[13:-55]
+    except:
+        driver.close()
     
     return access_token
 
@@ -77,7 +81,7 @@ def post_to_wall(page_id=None,message=None,page_access_token=None,
     
     if VID_PATH is not None:
         print("Video Post")
-        print("Dalam post-to_wall"+VID_TITLE)
+        print(f"Dalam post-to_wall {VID_TITLE}")
         if link is None:
             link = ''
         
@@ -103,22 +107,57 @@ def post_to_wall(page_id=None,message=None,page_access_token=None,
         print("Image Post")
         if link is None:
             link =''
-        
-        data = {
-        'message': clean_message(message) + '\n' + link,
-        'access_token': page_access_token,
-        'published': publish,
-        'scheduled_publish_time':timestamp,
-        }
-        try:
-            files = {
-                'file': open(IMG_PATH, 'rb')
+        if len(IMG_PATH.split(",")) > 1:
+            print("Multiple Image Post")
+
+            IMG_PATH = IMG_PATH.split(",")
+            photo_id=[]
+            for img in IMG_PATH:
+                data = {
+                        'message': clean_message(message),
+                        'access_token': page_access_token,
+                        'published': publish,            
+                        }
+                try:        
+                    files = {
+                        'file': open(img, 'rb')
+                    }
+                except:
+                    return    '''{"error":{"message":"Wrong file path"}}'''
+
+                x = requests.post(f'https://graph.facebook.com/{page_id}/photos', data=data, files=files)
+                print(x.text)
+                photo_id.append(json.loads(x.text)["id"])
+
+            data = {
+                "message": clean_message(message),        
+                "access_token": page_access_token,
+                'published': publish,
+                'scheduled_publish_time':timestamp,
             }
-            
-            x = requests.post(f'https://graph.facebook.com/{page_id}/photos', data=data, files=files)
+            for ind,i in enumerate(photo_id):
+                print(ind,i)
+                data.update({f'attached_media[{ind}]' : {"media_fbid":i}})
+
+            x = requests.post(f'https://graph.facebook.com/{page_id}/feed?'+urllib.parse.urlencode(data))
             return x.text
-        except:
-            return '''{"error":{"message":"Wrong file path"}}'''
+        
+        else: 
+            data = {
+            'message': clean_message(message) + '\n' + link,
+            'access_token': page_access_token,
+            'published': publish,
+            'scheduled_publish_time':timestamp,
+            }
+            try:
+                files = {
+                    'file': open(IMG_PATH, 'rb')
+                }
+                
+                x = requests.post(f'https://graph.facebook.com/{page_id}/photos', data=data, files=files)
+                return x.text
+            except:
+                return '''{"error":{"message":"Wrong file path"}}'''
     else:
         print("Normal Post")
         print(link)
