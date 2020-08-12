@@ -106,6 +106,7 @@ class MyFloat(FloatLayout):
     def publish_post(self,btn):
         if isinstance(btn,Button):
             threads=[]
+            template = ['page_name','message/description/caption','link','img _path','vid_path','vid_title','Date & Time']
             posts_container = self.ids.testing
             posts_container.clear_widgets()
             
@@ -127,6 +128,11 @@ class MyFloat(FloatLayout):
             # Load post data
             try:
             	post_df= pd.read_csv(self.post_path).fillna(value= '')
+            	if list(post_df) != template:
+            		print("Wrong Template")
+            		self.show_popup3()
+            		return
+
             except:
             	self.show_popup2()
             	return
@@ -182,6 +188,7 @@ class MyFloat(FloatLayout):
     def show_popup1(self):
         floatL = FloatLayout(size=(300, 300))
         btn = Button(text ='Invalid Username/Password',
+        			background_color =(1, 1, 1, 1),
                     size_hint =(.3, .2), 
                     pos_hint ={'x':.35, 'y':.4 })
         floatL.add_widget(btn)
@@ -191,6 +198,17 @@ class MyFloat(FloatLayout):
     def show_popup2(self):
         floatL = FloatLayout(size=(300, 300))
         btn = Button(text ='Post Template file is not chosen',
+        			background_color =(1, 1, 1, 1),
+                    size_hint =(.3, .2), 
+                    pos_hint ={'x':.35, 'y':.4 })
+        floatL.add_widget(btn)
+        popupWindow = Popup(title="Error", content= floatL, size_hint=(None,None),size=(400,400))
+        popupWindow.open()
+
+    def show_popup3(self):
+        floatL = FloatLayout(size=(300, 300))
+        btn = Button(text ='The Template chosen is not correct',
+        			background_color =(1, 1, 1, 1),
                     size_hint =(.3, .2), 
                     pos_hint ={'x':.35, 'y':.4 })
         floatL.add_widget(btn)
